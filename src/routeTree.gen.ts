@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaitingRouteImport } from './routes/waiting'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as NavigateRouteImport } from './routes/navigate'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApplyRouteImport } from './routes/apply'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const WaitingRoute = WaitingRouteImport.update({
   id: '/waiting',
   path: '/waiting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NavigateRoute = NavigateRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/apply': typeof ApplyRoute
   '/dashboard': typeof DashboardRoute
   '/navigate': typeof NavigateRoute
+  '/profile': typeof ProfileRoute
   '/waiting': typeof WaitingRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/apply': typeof ApplyRoute
   '/dashboard': typeof DashboardRoute
   '/navigate': typeof NavigateRoute
+  '/profile': typeof ProfileRoute
   '/waiting': typeof WaitingRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,28 @@ export interface FileRoutesById {
   '/apply': typeof ApplyRoute
   '/dashboard': typeof DashboardRoute
   '/navigate': typeof NavigateRoute
+  '/profile': typeof ProfileRoute
   '/waiting': typeof WaitingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/apply' | '/dashboard' | '/navigate' | '/waiting'
+  fullPaths:
+    | '/'
+    | '/apply'
+    | '/dashboard'
+    | '/navigate'
+    | '/profile'
+    | '/waiting'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/apply' | '/dashboard' | '/navigate' | '/waiting'
-  id: '__root__' | '/' | '/apply' | '/dashboard' | '/navigate' | '/waiting'
+  to: '/' | '/apply' | '/dashboard' | '/navigate' | '/profile' | '/waiting'
+  id:
+    | '__root__'
+    | '/'
+    | '/apply'
+    | '/dashboard'
+    | '/navigate'
+    | '/profile'
+    | '/waiting'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +98,7 @@ export interface RootRouteChildren {
   ApplyRoute: typeof ApplyRoute
   DashboardRoute: typeof DashboardRoute
   NavigateRoute: typeof NavigateRoute
+  ProfileRoute: typeof ProfileRoute
   WaitingRoute: typeof WaitingRoute
 }
 
@@ -86,6 +109,13 @@ declare module '@tanstack/react-router' {
       path: '/waiting'
       fullPath: '/waiting'
       preLoaderRoute: typeof WaitingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/navigate': {
@@ -124,6 +154,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApplyRoute: ApplyRoute,
   DashboardRoute: DashboardRoute,
   NavigateRoute: NavigateRoute,
+  ProfileRoute: ProfileRoute,
   WaitingRoute: WaitingRoute,
 }
 export const routeTree = rootRouteImport
