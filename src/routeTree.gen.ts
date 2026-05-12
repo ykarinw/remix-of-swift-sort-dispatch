@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaitingRouteImport } from './routes/waiting'
+import { Route as NavigateRouteImport } from './routes/navigate'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const WaitingRoute = WaitingRouteImport.update({
   id: '/waiting',
   path: '/waiting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NavigateRoute = NavigateRouteImport.update({
+  id: '/navigate',
+  path: '/navigate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/apply': typeof ApplyRoute
   '/dashboard': typeof DashboardRoute
+  '/navigate': typeof NavigateRoute
   '/waiting': typeof WaitingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/apply': typeof ApplyRoute
   '/dashboard': typeof DashboardRoute
+  '/navigate': typeof NavigateRoute
   '/waiting': typeof WaitingRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/apply': typeof ApplyRoute
   '/dashboard': typeof DashboardRoute
+  '/navigate': typeof NavigateRoute
   '/waiting': typeof WaitingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/apply' | '/dashboard' | '/waiting'
+  fullPaths: '/' | '/apply' | '/dashboard' | '/navigate' | '/waiting'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/apply' | '/dashboard' | '/waiting'
-  id: '__root__' | '/' | '/apply' | '/dashboard' | '/waiting'
+  to: '/' | '/apply' | '/dashboard' | '/navigate' | '/waiting'
+  id: '__root__' | '/' | '/apply' | '/dashboard' | '/navigate' | '/waiting'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApplyRoute: typeof ApplyRoute
   DashboardRoute: typeof DashboardRoute
+  NavigateRoute: typeof NavigateRoute
   WaitingRoute: typeof WaitingRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/waiting'
       fullPath: '/waiting'
       preLoaderRoute: typeof WaitingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/navigate': {
+      id: '/navigate'
+      path: '/navigate'
+      fullPath: '/navigate'
+      preLoaderRoute: typeof NavigateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApplyRoute: ApplyRoute,
   DashboardRoute: DashboardRoute,
+  NavigateRoute: NavigateRoute,
   WaitingRoute: WaitingRoute,
 }
 export const routeTree = rootRouteImport
