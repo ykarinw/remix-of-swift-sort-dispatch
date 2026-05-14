@@ -1,5 +1,6 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { Boxes } from "lucide-react";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { Boxes, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const links = [
   { to: "/", label: "Beranda" },
@@ -11,6 +12,9 @@ const links = [
 
 export function SiteNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const { user, signOut } = useAuth();
+  const nav = useNavigate();
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
@@ -36,12 +40,21 @@ export function SiteNav() {
             );
           })}
         </nav>
-        <Link
-          to="/apply"
-          className="rounded-lg bg-gradient-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-105"
-        >
-          Mulai Kerja
-        </Link>
+        {user ? (
+          <button
+            onClick={async () => { await signOut(); nav({ to: "/" }); }}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold hover:bg-secondary"
+          >
+            <LogOut className="h-4 w-4" /> Keluar
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            className="rounded-lg bg-gradient-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-105"
+          >
+            Masuk
+          </Link>
+        )}
       </div>
     </header>
   );
