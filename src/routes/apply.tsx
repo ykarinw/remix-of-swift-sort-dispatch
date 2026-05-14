@@ -1,7 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { SiteNav } from "@/components/SiteNav";
-import { Upload, FileText, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { Upload, FileText, CheckCircle2, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/apply")({
   head: () => ({ meta: [{ title: "Daftar — SortirGo" }, { name: "description", content: "Apply sebagai pekerja sortir dengan upload CV." }] }),
@@ -10,13 +13,53 @@ export const Route = createFileRoute("/apply")({
 
 function ApplyPage() {
   const nav = useNavigate();
+  const { user, loading } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [form, setForm] = useState({ name: "", phone: "", city: "", exp: "0-1" });
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!loading && !user) nav({ to: "/login" });
+  }, [user, loading, nav]);
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    nav({ to: "/waiting" });
+    if (!user) return;
+    setBusy(true);
+    try {
+      let cv_path: string | null = null;
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) throw new Error("File maksimal 5MB");
+        const path = `${user.id}/${Date.now()}-${file.name}`;
+        const { error: upErr } = await supabase.storage.from("cvs").upload(path, file);
+        if (upErr) throw upErr;
+        cv_path = path;
+      }
+      const { error } = await supabase.from("applications").insert({
+        user_id: user.id,
+        full_name: form.name,
+        phone: form.phone,
+        city: form.city,
+        experience: form.exp,
+        cv_path,
+      });
+      if (error) throw error;
+
+      // sync profile data
+      await supabase.from("profiles").update({
+        full_name: form.name, phone: form.phone, city: form.city,
+      }).eq("user_id", user.id);
+
+      toast.success("Lamaran terkirim!");
+      nav({ to: "/waiting" });
+    } catch (err: any) {
+      toast.error(err.message ?? "Gagal mengirim");
+    } finally {
+      setBusy(false);
+    }
   };
+
+  if (loading) return <div className="grid min-h-screen place-items-center"><Loader2 className="h-6 w-6 animate-spin"/></div>;
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,7 +72,6 @@ function ApplyPage() {
         </div>
 
         <form onSubmit={submit} className="space-y-6 rounded-2xl border border-border bg-card p-6 md:p-8 shadow-card">
-          {/* Upload */}
           <label className="block">
             <span className="text-sm font-medium">CV / Resume (PDF, max 5MB)</span>
             <div className="mt-2 cursor-pointer rounded-xl border-2 border-dashed border-border bg-secondary/40 p-8 text-center transition-colors hover:border-primary/60 hover:bg-primary/5">
@@ -75,7 +117,8 @@ function ApplyPage() {
             </ul>
           </div>
 
-          <button type="submit" className="w-full rounded-lg bg-gradient-primary py-3.5 text-sm font-bold text-primary-foreground shadow-glow transition-transform hover:scale-[1.01]">
+          <button type="submit" disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-primary py-3.5 text-sm font-bold text-primary-foreground shadow-glow transition-transform hover:scale-[1.01] disabled:opacity-60">
+            {busy && <Loader2 className="h-4 w-4 animate-spin"/>}
             Kirim & Proses CV
           </button>
         </form>
