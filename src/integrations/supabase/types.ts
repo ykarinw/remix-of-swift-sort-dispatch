@@ -14,7 +14,150 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          city: string
+          created_at: string
+          cv_path: string | null
+          experience: string
+          full_name: string
+          id: string
+          phone: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          cv_path?: string | null
+          experience: string
+          full_name: string
+          id?: string
+          phone: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          cv_path?: string | null
+          experience?: string
+          full_name?: string
+          id?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          accepted_at: string | null
+          completed_at: string | null
+          created_at: string
+          distance_km: number
+          duration_hours: number
+          id: string
+          order_code: string
+          packages: number
+          pay_amount: number
+          status: string
+          updated_at: string
+          urgency: string
+          warehouse_address: string
+          warehouse_name: string
+          worker_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          distance_km: number
+          duration_hours: number
+          id?: string
+          order_code?: string
+          packages: number
+          pay_amount: number
+          status?: string
+          updated_at?: string
+          urgency?: string
+          warehouse_address: string
+          warehouse_name: string
+          worker_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          distance_km?: number
+          duration_hours?: number
+          id?: string
+          order_code?: string
+          packages?: number
+          pay_amount?: number
+          status?: string
+          updated_at?: string
+          urgency?: string
+          warehouse_address?: string
+          warehouse_name?: string
+          worker_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          city: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          is_online: boolean
+          phone: string | null
+          rating: number
+          specialization: string
+          tier: string
+          total_earnings: number
+          total_orders: number
+          updated_at: string
+          user_id: string
+          worker_id: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_online?: boolean
+          phone?: string | null
+          rating?: number
+          specialization?: string
+          tier?: string
+          total_earnings?: number
+          total_orders?: number
+          updated_at?: string
+          user_id: string
+          worker_id?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_online?: boolean
+          phone?: string | null
+          rating?: number
+          specialization?: string
+          tier?: string
+          total_earnings?: number
+          total_orders?: number
+          updated_at?: string
+          user_id?: string
+          worker_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
