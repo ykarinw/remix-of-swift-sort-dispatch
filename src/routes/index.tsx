@@ -12,10 +12,10 @@ function Index() {
     <div className="min-h-screen bg-background">
       <SiteNav />
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-40" />
-        <div className="absolute -top-40 right-0 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-32">
+      <section className="relative isolate overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 -z-10 grid-bg opacity-40" />
+        <div className="pointer-events-none absolute -top-40 right-0 -z-10 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
+        <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-32">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
