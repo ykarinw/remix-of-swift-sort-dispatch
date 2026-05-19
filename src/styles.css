@@ -163,8 +163,8 @@
 }
 
 @layer utilities {
-  .bg-gradient-primary { background: var(--gradient-primary); }
-  .bg-gradient-dark { background: var(--gradient-dark); }
+  .bg-gradient-primary { background-image: var(--gradient-primary); }
+  .bg-gradient-dark { background-image: var(--gradient-dark); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .grid-bg {
