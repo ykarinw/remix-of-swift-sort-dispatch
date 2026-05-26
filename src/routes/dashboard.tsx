@@ -157,9 +157,31 @@ function Dashboard() {
                   <Meta icon={Boxes} label="Paket" value={`${o.packages}`} />
                 </div>
 
+                {(() => {
+                  const full = o.current_workers >= o.max_workers;
+                  const pct = Math.min(100, (o.current_workers / Math.max(1, o.max_workers)) * 100);
+                  return (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Kuota pekerja</span>
+                        <span className={`font-semibold ${full ? "text-destructive" : "text-foreground"}`}>
+                          {o.current_workers}/{o.max_workers} {full && "• PENUH"}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                        <div className={`h-full transition-all ${full ? "bg-destructive" : "bg-primary"}`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="mt-4 flex gap-2">
-                  <button disabled={busy === o.id} onClick={() => accept(o)} className="flex-1 rounded-lg bg-gradient-primary py-2.5 text-center text-sm font-bold text-primary-foreground shadow-glow disabled:opacity-60">
-                    {busy === o.id ? "Memproses..." : "Terima Order"}
+                  <button
+                    disabled={busy === o.id || o.current_workers >= o.max_workers}
+                    onClick={() => accept(o)}
+                    className="flex-1 rounded-lg bg-gradient-primary py-2.5 text-center text-sm font-bold text-primary-foreground shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {o.current_workers >= o.max_workers ? "Kuota Penuh" : busy === o.id ? "Memproses..." : "Terima Order"}
                   </button>
                 </div>
               </div>
