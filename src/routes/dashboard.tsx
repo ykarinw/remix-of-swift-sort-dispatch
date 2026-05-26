@@ -64,13 +64,24 @@ function Dashboard() {
 
   const accept = async (o: Order) => {
     if (!user) return;
+    if (o.current_workers >= o.max_workers) {
+      toast.error("Kuota order ini sudah penuh");
+      return;
+    }
+    const ok = window.confirm(`Konfirmasi ambil order ${o.order_code} di ${o.warehouse_name}?\nBayaran: Rp ${o.pay_amount.toLocaleString("id-ID")}`);
+    if (!ok) return;
     setBusy(o.id);
-    const { error } = await supabase.from("orders").update({
-      status: "accepted", worker_id: user.id, accepted_at: new Date().toISOString(),
-    }).eq("id", o.id).eq("status", "available");
+    const nextCount = o.current_workers + 1;
+    const isFull = nextCount >= o.max_workers;
+    const { data, error } = await supabase.from("orders").update({
+      current_workers: nextCount,
+      status: isFull ? "full" : "available",
+      worker_id: user.id,
+      accepted_at: new Date().toISOString(),
+    }).eq("id", o.id).eq("current_workers", o.current_workers).select().maybeSingle();
     setBusy(null);
-    if (error) { toast.error("Gagal menerima order"); return; }
-    toast.success(`Order ${o.order_code} diterima!`);
+    if (error || !data) { toast.error("Gagal menerima order — mungkin kuota baru saja penuh"); return; }
+    toast.success(`Berhasil! Order ${o.order_code} diterima ✓`);
     nav({ to: "/navigate" });
   };
 
