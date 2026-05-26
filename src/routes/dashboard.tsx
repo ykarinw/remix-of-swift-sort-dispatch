@@ -21,6 +21,8 @@ interface Order {
   pay_amount: number;
   urgency: string;
   status: string;
+  max_workers: number;
+  current_workers: number;
 }
 
 interface Profile {
