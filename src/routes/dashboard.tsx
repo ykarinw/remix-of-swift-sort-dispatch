@@ -21,6 +21,8 @@ interface Order {
   pay_amount: number;
   urgency: string;
   status: string;
+  max_workers: number;
+  current_workers: number;
 }
 
 interface Profile {
@@ -46,7 +48,7 @@ function Dashboard() {
     if (!user) return;
     const load = async () => {
       const [{ data: o }, { data: p }] = await Promise.all([
-        supabase.from("orders").select("*").eq("status", "available").order("created_at", { ascending: false }),
+        supabase.from("orders").select("*").in("status", ["available","full"]).order("created_at", { ascending: false }),
         supabase.from("profiles").select("full_name,rating,total_orders,total_earnings,is_online").eq("user_id", user.id).maybeSingle(),
       ]);
       setOrders((o ?? []) as Order[]);
@@ -62,13 +64,24 @@ function Dashboard() {
 
   const accept = async (o: Order) => {
     if (!user) return;
+    if (o.current_workers >= o.max_workers) {
+      toast.error("Kuota order ini sudah penuh");
+      return;
+    }
+    const ok = window.confirm(`Konfirmasi ambil order ${o.order_code} di ${o.warehouse_name}?\nBayaran: Rp ${o.pay_amount.toLocaleString("id-ID")}`);
+    if (!ok) return;
     setBusy(o.id);
-    const { error } = await supabase.from("orders").update({
-      status: "accepted", worker_id: user.id, accepted_at: new Date().toISOString(),
-    }).eq("id", o.id).eq("status", "available");
+    const nextCount = o.current_workers + 1;
+    const isFull = nextCount >= o.max_workers;
+    const { data, error } = await supabase.from("orders").update({
+      current_workers: nextCount,
+      status: isFull ? "full" : "available",
+      worker_id: user.id,
+      accepted_at: new Date().toISOString(),
+    }).eq("id", o.id).eq("current_workers", o.current_workers).select().maybeSingle();
     setBusy(null);
-    if (error) { toast.error("Gagal menerima order"); return; }
-    toast.success(`Order ${o.order_code} diterima!`);
+    if (error || !data) { toast.error("Gagal menerima order — mungkin kuota baru saja penuh"); return; }
+    toast.success(`Berhasil! Order ${o.order_code} diterima ✓`);
     nav({ to: "/navigate" });
   };
 
@@ -144,9 +157,31 @@ function Dashboard() {
                   <Meta icon={Boxes} label="Paket" value={`${o.packages}`} />
                 </div>
 
+                {(() => {
+                  const full = o.current_workers >= o.max_workers;
+                  const pct = Math.min(100, (o.current_workers / Math.max(1, o.max_workers)) * 100);
+                  return (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Kuota pekerja</span>
+                        <span className={`font-semibold ${full ? "text-destructive" : "text-foreground"}`}>
+                          {o.current_workers}/{o.max_workers} {full && "• PENUH"}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                        <div className={`h-full transition-all ${full ? "bg-destructive" : "bg-primary"}`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="mt-4 flex gap-2">
-                  <button disabled={busy === o.id} onClick={() => accept(o)} className="flex-1 rounded-lg bg-gradient-primary py-2.5 text-center text-sm font-bold text-primary-foreground shadow-glow disabled:opacity-60">
-                    {busy === o.id ? "Memproses..." : "Terima Order"}
+                  <button
+                    disabled={busy === o.id || o.current_workers >= o.max_workers}
+                    onClick={() => accept(o)}
+                    className="flex-1 rounded-lg bg-gradient-primary py-2.5 text-center text-sm font-bold text-primary-foreground shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {o.current_workers >= o.max_workers ? "Kuota Penuh" : busy === o.id ? "Memproses..." : "Terima Order"}
                   </button>
                 </div>
               </div>

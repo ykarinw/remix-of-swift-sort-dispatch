@@ -58,9 +58,11 @@ export type Database = {
           accepted_at: string | null
           completed_at: string | null
           created_at: string
+          current_workers: number
           distance_km: number
           duration_hours: number
           id: string
+          max_workers: number
           order_code: string
           packages: number
           pay_amount: number
@@ -75,9 +77,11 @@ export type Database = {
           accepted_at?: string | null
           completed_at?: string | null
           created_at?: string
+          current_workers?: number
           distance_km: number
           duration_hours: number
           id?: string
+          max_workers?: number
           order_code?: string
           packages: number
           pay_amount: number
@@ -92,9 +96,11 @@ export type Database = {
           accepted_at?: string | null
           completed_at?: string | null
           created_at?: string
+          current_workers?: number
           distance_km?: number
           duration_hours?: number
           id?: string
+          max_workers?: number
           order_code?: string
           packages?: number
           pay_amount?: number
