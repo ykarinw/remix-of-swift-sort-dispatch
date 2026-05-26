@@ -48,7 +48,7 @@ function Dashboard() {
     if (!user) return;
     const load = async () => {
       const [{ data: o }, { data: p }] = await Promise.all([
-        supabase.from("orders").select("*").eq("status", "available").order("created_at", { ascending: false }),
+        supabase.from("orders").select("*").in("status", ["available","full"]).order("created_at", { ascending: false }),
         supabase.from("profiles").select("full_name,rating,total_orders,total_earnings,is_online").eq("user_id", user.id).maybeSingle(),
       ]);
       setOrders((o ?? []) as Order[]);
